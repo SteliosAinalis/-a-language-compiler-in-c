@@ -7,6 +7,9 @@ typedef enum {
     TOKEN_SEMI,
     TOKEN_OPEN_PAREN,
     TOKEN_CLOSE_PAREN,
+    TOKEN_IDENTIFIER,
+    TOKEN_EQUALS,
+    TOKEN_INT_LITERAL,
     TOKEN_EOF 
 } TokenType;
 

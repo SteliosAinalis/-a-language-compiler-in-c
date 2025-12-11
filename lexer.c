@@ -28,14 +28,14 @@ Token *read_number(char current, FILE *file) {
     }
     value[value_index] = '\0';
     ungetc(current, file); 
-    return init_token(TOKEN_INT, value);
+    return init_token(TOKEN_INT_LITERAL, value);
 }
 
-Token *read_keyword(char current, FILE *file) {
+Token *read_identifier(char current, FILE *file) {
     char *value = malloc(sizeof(char) * 20);
     int value_index = 0;
 
-    while (isalpha(current) && current != EOF) {
+    while (isalnum(current) || current == '_') {
         value[value_index++] = current;
         current = fgetc(file);
     }
@@ -45,7 +45,10 @@ Token *read_keyword(char current, FILE *file) {
     if (strcmp(value, "exit") == 0) {
         return init_token(TOKEN_EXIT, value);
     }
-    return init_token(TOKEN_EXIT, value); 
+    else if (strcmp(value, "int") == 0) {
+        return init_token(TOKEN_INT, value);
+    }
+    return init_token(TOKEN_IDENTIFIER, value); 
 }
 
 Token **tokenize(FILE *file) {
@@ -64,13 +67,16 @@ Token **tokenize(FILE *file) {
             found_token = read_number(current, file);
         } 
         else if (isalpha(current)) {
-            found_token = read_keyword(current, file);
+            found_token = read_identifier(current, file);
         } 
         else if (current == '(') {
             found_token = init_token(TOKEN_OPEN_PAREN, str_copy("("));
         }
         else if (current == ')') {
             found_token = init_token(TOKEN_CLOSE_PAREN, str_copy(")"));
+        }
+        else if (current == '=') { 
+            found_token = init_token(TOKEN_EQUALS, str_copy("="));
         }
         else if (current == ';') {
             found_token = init_token(TOKEN_SEMI, str_copy(";"));

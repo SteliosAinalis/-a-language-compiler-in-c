@@ -24,6 +24,9 @@ const char* token_type_to_str(TokenType type) {
         case TOKEN_SEMI: return ";";
         case TOKEN_OPEN_PAREN: return "(";
         case TOKEN_CLOSE_PAREN: return ")";
+        case TOKEN_IDENTIFIER: return "identifier";
+        case TOKEN_EQUALS: return "=";
+        case TOKEN_INT_LITERAL: return "integer literal";
         case TOKEN_EOF: return "EOF";
         default: return "UNKNOWN";
     }
@@ -55,7 +58,7 @@ void parser_consume(Parser *p, TokenType type) {
 NodeExpr *parser_parse_expr(Parser *p){
      Token *t = parser_get_current_token(p);
 
-    if (t->type == TOKEN_INT) {
+    if (t->type == TOKEN_INT_LITERAL) {
         NodeExpr *node_expr = malloc(sizeof(NodeExpr));
         node_expr->int_token = parser_consume_token(p);
         return node_expr;

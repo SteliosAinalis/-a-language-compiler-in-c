@@ -11,5 +11,10 @@ typedef struct {
     NodeExpr *expr;
 }NodeExit;
 
+typedef struct {
+    Token *identifier;
+    NodeExpr *expr;
+}NodeVarDecl;
+
 
 #endif
