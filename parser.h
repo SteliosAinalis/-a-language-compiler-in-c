@@ -12,6 +12,7 @@ typedef struct {
 
 Parser *parser_init(Token **tokens);
 
-NodeExit *parser_parse(Parser *parser);
+NodeStmt *parser_parse(Parser *parser);
+
 
 #endif

@@ -75,30 +75,37 @@ Token **tokenize(FILE *file) {
         else if (current == ')') {
             found_token = init_token(TOKEN_CLOSE_PAREN, str_copy(")"));
         }
-        else if (current == '=') { 
-            found_token = init_token(TOKEN_EQUALS, str_copy("="));
+        else if (current == '=') {
+            found_token = init_token(TOKEN_EQUALS, str_copy("=")); 
         }
         else if (current == ';') {
             found_token = init_token(TOKEN_SEMI, str_copy(";"));
         }
 
         if (found_token != NULL) {
-            tokens[size] = found_token;
-            size++;
             if (size >= capacity) {
                 capacity *= 2;
                 tokens = realloc(tokens, sizeof(Token*) * capacity);
             }
+            tokens[size] = found_token;
+            size++;
         }
 
         current = fgetc(file);
     }
-    tokens[size] = init_token(TOKEN_EOF, "");
-        size++;
+    
     if (size >= capacity) {
+        capacity *= 2;
         tokens = realloc(tokens, sizeof(Token*) * capacity);
     }
-    tokens[size-1] = NULL; 
+    tokens[size] = init_token(TOKEN_EOF, str_copy("")); 
+    size++;
+
+    if (size >= capacity) {
+        capacity *= 2;
+        tokens = realloc(tokens, sizeof(Token*) * capacity);
+    }
+    tokens[size] = NULL; 
 
     return tokens;
 }

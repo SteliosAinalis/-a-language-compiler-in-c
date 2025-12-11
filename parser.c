@@ -55,35 +55,69 @@ void parser_consume(Parser *p, TokenType type) {
 
 
 
-NodeExpr *parser_parse_expr(Parser *p){
-     Token *t = parser_get_current_token(p);
+NodeExpr *parser_parse_expr(Parser *p) {
+    Token *t = parser_get_current_token(p);
 
     if (t->type == TOKEN_INT_LITERAL) {
-        NodeExpr *node_expr = malloc(sizeof(NodeExpr));
-        node_expr->int_token = parser_consume_token(p);
+        NodeExpr *node_expr = calloc(1, sizeof(NodeExpr));
+        node_expr->int_token_literal = parser_consume_token(p);
         return node_expr;
-    } else {
-        printf("Syntax Error: Expected integer literal, got '%s'\n", t->value);
+    } 
+    else if (t->type == TOKEN_IDENTIFIER) {
+        NodeExpr *node_expr = calloc(1, sizeof(NodeExpr));
+        node_expr->identifier = parser_consume_token(p);
+        return node_expr;
+    }
+    else {
+        printf("Syntax Error: Expected integer or identifier, got '%s'\n", t->value);
         exit(1);
     }
 }
 
 
-NodeExit *parser_parse(Parser *p) {
+NodeStmt *parser_parse(Parser *p) {
     Token *t = parser_get_current_token(p);
+
+    if (t->type == TOKEN_EOF) {
+        return NULL; 
+    }
     if (t->type == TOKEN_EXIT) {
 
-        //consume while checking if required grammar is given
+        //consume while checking if required grammar is given for token exit
         parser_consume_token(p);         
         parser_consume(p, TOKEN_OPEN_PAREN); 
         NodeExpr *expr = parser_parse_expr(p);
         parser_consume(p, TOKEN_CLOSE_PAREN);         
         parser_consume(p, TOKEN_SEMI); 
 
-        //build node
         NodeExit *node_exit = malloc(sizeof(NodeExit));
         node_exit->expr = expr;
-        return node_exit;
+
+        NodeStmt *stmt = malloc(sizeof(NodeStmt));
+        stmt->type = NODE_STMT_EXIT;
+        stmt->data.exit = node_exit;
+        return stmt;
+
+    }else if(t->type == TOKEN_INT){
+
+        //consume while checking if required grammar is given for token int
+        parser_consume_token(p);         
+        Token *ident = parser_get_current_token(p);
+        parser_consume(p, TOKEN_IDENTIFIER);
+        
+        parser_consume(p, TOKEN_EQUALS); 
+        
+        NodeExpr *expr = parser_parse_expr(p); 
+        parser_consume(p, TOKEN_SEMI); 
+
+        NodeVarDecl *var_node = malloc(sizeof(NodeVarDecl));
+        var_node->identifier = ident;
+        var_node->expr = expr;
+
+        NodeStmt *stmt = malloc(sizeof(NodeStmt));
+        stmt->type = NODE_STMT_VAR_DECL;
+        stmt->data.var_decl = var_node;
+        return stmt;
     }
 
     printf("Syntax Error: Unexpected token '%s'\n", t->value);
